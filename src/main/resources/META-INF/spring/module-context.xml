@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!-- Main job definition. Do not rename it. -->
+	<job xmlns="http://www.springframework.org/schema/batch"
+		id="mainJob" job-repository="jobRepository" restartable="true">
+
+		<step id="CheckResource" >
+			<tasklet ref="CheckResourceStep" />
+ 			<next on="*" to="ReadCSV"/>
+			<next on="FAILED" to="Report"/> 
+        </step>
+		<step id="ReadCSV" >
+			<tasklet ref="ReadCSVStep" />
+			<next on="*" to="CreateXML"/>			
+			<next on="FAILED" to="Report"/>
+        </step>
+		<step id="CreateXML" >
+			<tasklet ref="CreateXMLStep" />
+			<next on="*" to="Report"/>
+			<next on="FAILED" to="Report"/>
+        </step>
+		<step id="Report" >
+			<tasklet ref="ReportStep" />
+        </step>
+	</job>
+
+	<!-- Put your standard readers and writers here (see batchContext-templates.xml) -->
+	<bean id="CheckResourceStep" class="fr.msaidara.batch.step.CheckResources">
+    	<property name="directoryOut" ref="dOUT" />
+		<property name="directoryIn" ref="dIN" />
+		<property name="directoryReport" ref="dREPORT" />
+	</bean> 
+	
+	<bean id="ReadCSVStep" class="fr.msaidara.batch.step.ReadFileCSV">
+		<property name="directoryIn" ref="dIN" />
+	</bean>
+	
+	<bean id="CreateXMLStep" class="fr.msaidara.batch.step.CreateXML">
+		<property name="directoryOut" ref="dOUT" />
+		<property name="directoryIn" ref="dIN" />
+	</bean>
+	
+	<bean id="ReportStep" class="fr.msaidara.batch.step.Report">
+		<property name="directoryReport" ref="dREPORT" />
+	</bean>
+	
+	<bean id="dIN" class="org.springframework.core.io.FileSystemResource" >
+		<constructor-arg value="${batch.arg.dIN}" />
+	</bean>
+	
+	<bean id="dOUT" class="org.springframework.core.io.FileSystemResource" >
+		<constructor-arg value="${batch.arg.dOUT}" />
+	</bean>
+	
+	<bean id="dREPORT" class="org.springframework.core.io.FileSystemResource" >
+		<constructor-arg value="${batch.arg.dREPORT}" />
+	</bean>
+</beans>

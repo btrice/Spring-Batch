@@ -1,0 +1,17 @@
+language: java
+jdk: 
+ - openjdk6
+before_install: mvn install -DskipTests=true -DfinalName=spring-batch-Generic-$TRAVIS_TAG-SNAPSHOT
+after_success: mvn cobertura:cobertura org.eluder.coveralls:coveralls-maven-plugin:3.2.1:report
+deploy:
+  provider: releases
+  api_key:
+    secure: Ox1PLvQUF1Z7siWi4imPgFDlypm62cfHaBji7/C2gBcwthC7XtA5/YAiMC6J0rd/6ny6QU/8JADyzr4qvt8HBb4cWFouuj36JSwraDSPYnKugG7GkdfDe5p5iVmwlbJ4jnYfb60WSq8ZjGxuzOqnSyksyZgPGX2+LAFM3u7s9AIYQUPOv2GCojIcW4LD4ftMcPpa6J8JQydm5ima4uUQXztfTokHLVoE/KymkwyC4QBFPQSciQLquVzc3ppCO4GQ5n8M2ggJkGAYNCrte+Nf+kbb/RRrZ2SFr/sLb1TC3QldQJSNBJgr+tkCILg/wH2F1mCZx9YltKrqdgNIdYRPTLSrdkrwj8iCpsX1PL8pwmCTBbC0DFcpHJw5uiK9zX8du+jmoPv/kWnuGTygVIlsGHMCtalR5YpC3g6zfRv8PlYb9JgsBen8WSDqOQ8znfvRaR/i6DyLBiWV0TXqRq02yUVAX4YohRFjoRKriQ+6EzL1Oy5oQQ1ueGA3NNgmmG/PGNuTPyEXIwRNWQ5jJroOQdYKhmaW6OIuPxqB9YCGCE24BUqBvMheoMNnCCdpiqOaK8HLmb9JFPCqk8CDNMC0f/OQJOdb4MfdbBIUcqTFA/4kWv/L+Okr9if1jXfCnsHSa8p4aYgPMZ+4cKtLLOZXmAlOM5HtbMVzsD7fasGEtG4=
+  file: 
+   - target/spring-batch-Generic-$TRAVIS_TAG-SNAPSHOT.jar
+   - target/spring-batch-Generic.cmd
+  skip_cleanup: true
+  on:
+    repo: btrice/Spring-Batch
+    all_branches: true
+    tags: true
